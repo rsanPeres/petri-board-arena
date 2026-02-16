@@ -1,0 +1,50 @@
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
+
+# ----------------------------
+# Root types 
+# ----------------------------
+
+type Query {
+  health: Health!
+
+  arena(id: UUID!): Arena
+  arenas(filter: ArenaFilter, page: PageInput = {limit: 20, offset: 0}): ArenaPage!
+
+  arenaSnapshot(arenaId: UUID!, atTick: Long!): ArenaSnapshot
+  arenaHistory(arenaId: UUID!, fromTick: Long!, toTick: Long!, mode: DiffMode = DELTA): [ArenaSnapshot!]!
+
+  leaderboard(arenaId: UUID!, top: Int = 20): [LeaderboardEntry!]!
+  metrics(arenaId: UUID!, windowSeconds: Int = 60): ArenaMetrics!
+
+  organism(id: UUID!): Organism
+  genome(id: UUID!): Genome
+}
+
+type Mutation {
+  # Arena lifecycle
+  createArena(input: CreateArenaInput!): CreateArenaPayload!
+  startArena(input: StartArenaInput!): StartArenaPayload!
+  pauseArena(input: PauseArenaInput!): PauseArenaPayload!
+  resumeArena(input: ResumeArenaInput!): ResumeArenaPayload!
+  stopArena(input: StopArenaInput!): StopArenaPayload!
+
+  # Player session
+  joinArena(input: JoinArenaInput!): JoinArenaPayload!
+  leaveArena(input: LeaveArenaInput!): LeaveArenaPayload!
+
+  # Commands (write-side)
+  submitAction(input: SubmitActionInput!): SubmitActionPayload!
+
+  # Admin/ops
+  setArenaConfig(input: SetArenaConfigInput!): SetArenaConfigPayload!
+}
+
+type Subscription {
+  arenaEvents(arenaId: UUID!): ArenaEvent!
+  arenaSnapshots(arenaId: UUID!, mode: DiffMode = DELTA): ArenaSnapshot!
+  arenaMetrics(arenaId: UUID!, windowSeconds: Int = 60): ArenaMetrics!
+}

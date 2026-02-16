@@ -1,0 +1,117 @@
+# ----------------------------
+# Inputs / Payloads
+# ----------------------------
+
+input CreateArenaInput {
+  name: String!
+  config: ArenaConfigInput!
+}
+
+input ArenaConfigInput {
+  tickMillis: Int! = 100
+  width: Int! = 256
+  height: Int! = 256
+
+  diffusionRate: Float! = 0.12
+  mutationRate: Float! = 0.001
+
+  maxOrganisms: Int! = 50000
+  snapshotEveryTicks: Int! = 5
+
+  temperature: TemperatureInput! = { value: 37.0, unit: C }
+}
+
+input TemperatureInput {
+  value: Float!
+  unit: TemperatureUnit!
+}
+
+type CreateArenaPayload {
+  arena: Arena!
+}
+
+input StartArenaInput { arenaId: UUID! }
+type StartArenaPayload { ok: Boolean!, arena: Arena! }
+
+input PauseArenaInput { arenaId: UUID! }
+type PauseArenaPayload { ok: Boolean!, arena: Arena! }
+
+input ResumeArenaInput { arenaId: UUID! }
+type ResumeArenaPayload { ok: Boolean!, arena: Arena! }
+
+input StopArenaInput { arenaId: UUID! }
+type StopArenaPayload { ok: Boolean!, arena: Arena! }
+
+input JoinArenaInput {
+  arenaId: UUID!
+  displayName: String!
+}
+type JoinArenaPayload {
+  player: Player!
+  sessionToken: String!
+}
+
+input LeaveArenaInput {
+  arenaId: UUID!
+  playerId: UUID!
+}
+type LeaveArenaPayload { ok: Boolean! }
+
+input SetArenaConfigInput {
+  arenaId: UUID!
+  config: ArenaConfigInput!
+}
+type SetArenaConfigPayload { ok: Boolean!, arena: Arena! }
+
+input SubmitActionInput {
+  arenaId: UUID!
+  playerId: UUID!
+
+  type: ActionType!
+  applyAtTick: Long
+
+  addNutrients: AddNutrientsInput
+  dropAntibiotic: DropAntibioticInput
+  setTemperature: SetTemperatureInput
+  spawnOrganism: SpawnOrganismInput
+}
+
+input AddNutrientsInput {
+  area: AreaInput!
+  amount: Int!
+}
+
+input DropAntibioticInput {
+  area: AreaInput!
+  kind: AntibioticKind!
+  concentration: Float!
+}
+
+input SetTemperatureInput {
+  temperature: TemperatureInput!
+}
+
+input SpawnOrganismInput {
+  kind: OrganismKind!
+  position: PointInput!
+  genomeTemplateId: UUID
+}
+
+input AreaInput {
+  x: Int!
+  y: Int!
+  width: Int!
+  height: Int!
+}
+
+input PointInput {
+  x: Int!
+  y: Int!
+}
+
+type SubmitActionPayload {
+  actionId: UUID!
+  accepted: Boolean!
+  reason: String
+  willApplyAtTick: Long!
+}

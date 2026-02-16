@@ -1,0 +1,45 @@
+# ----------------------------
+# Events (Subscription)
+# ----------------------------
+
+
+union ArenaEvent =
+    ArenaLifecycleEvent
+  | ActionAcceptedEvent
+  | ActionRejectedEvent
+  | TickAdvancedEvent
+  | SnapshotEmittedEvent
+
+type ArenaLifecycleEvent {
+  arenaId: UUID!
+  at: Time!
+  kind: ArenaLifecycleEventKind!
+  byPlayerId: UUID
+}
+
+type ActionAcceptedEvent {
+  arenaId: UUID!
+  at: Time!
+  actionId: UUID!
+  action: PlayerAction!
+}
+
+type ActionRejectedEvent {
+  arenaId: UUID!
+  at: Time!
+  actionId: UUID!
+  reason: String!
+}
+
+type TickAdvancedEvent {
+  arenaId: UUID!
+  at: Time!
+  tick: Long!
+}
+
+type SnapshotEmittedEvent {
+  arenaId: UUID!
+  at: Time!
+  tick: Long!
+  mode: DiffMode!
+}

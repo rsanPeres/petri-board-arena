@@ -1,0 +1,51 @@
+schema:
+  - graph/*.graphqls
+  # se você colocou os schemas em subpasta, descomente:
+  # - graph/**/*.graphqls
+
+exec:
+  package: graph
+  layout: single-file
+  filename: graph/generated.go
+
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+resolver:
+  package: graph
+  layout: follow-schema
+  dir: graph
+  filename_template: "{name}.resolvers.go"
+
+call_argument_directives_with_null: true
+
+models:
+  UUID:
+    model:
+      - github.com/99designs/gqlgen/graphql.UUID
+
+  # Time é um scalar custom seu. Escolhe uma das opções:
+  # Opção A (recomendado): time.Time (encoding RFC3339 padrão)
+  Time:
+    model:
+      - time.Time
+
+  # Long é um scalar custom seu para tick, etc.
+  Long:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int64
+      # alternativa simples:
+      # - int64
+
+  JSON:
+    model:
+      - github.com/99designs/gqlgen/graphql.Map
+
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int32
+
+
+skip_validation: true
+

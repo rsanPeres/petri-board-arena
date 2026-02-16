@@ -1,0 +1,260 @@
+# ----------------------------
+# Common
+# ----------------------------
+
+type Health {
+  ok: Boolean!
+  version: String!
+  now: Time!
+}
+
+input PageInput {
+  limit: Int!
+  offset: Int!
+}
+
+type ArenaPage {
+  items: [Arena!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+# ----------------------------
+# Arena
+# ----------------------------
+
+type Arena {
+  id: UUID!
+  name: String!
+  status: ArenaStatus!
+  createdAt: Time!
+  startedAt: Time
+  finishedAt: Time
+
+  tick: Long!
+  config: ArenaConfig!
+
+  players: [Player!]!
+  world: WorldInfo!
+
+  lastSnapshot: ArenaSnapshot
+}
+
+type Player {
+  id: UUID!
+  displayName: String!
+  joinedAt: Time!
+  role: PlayerType!
+}
+
+type ArenaConfig {
+  tickMillis: Int!
+  width: Int!
+  height: Int!
+
+  diffusionRate: Float!
+  mutationRate: Float!
+
+  maxOrganisms: Int!
+  snapshotEveryTicks: Int!
+
+  temperature: Temperature!
+}
+
+type Temperature {
+  value: Float!
+  unit: TemperatureUnit!
+}
+
+type WorldInfo {
+  width: Int!
+  height: Int!
+  layers: [WorldLayer!]!
+}
+
+input ArenaFilter {
+  status: ArenaStatus
+  nameContains: String
+}
+
+# ----------------------------
+# Snapshots / Deltas
+# ----------------------------
+
+type ArenaSnapshot {
+  arenaId: UUID!
+  tick: Long!
+  capturedAt: Time!
+
+  mode: DiffMode!
+
+  grid: GridSnapshot
+  delta: GridDelta
+
+  stats: TickStats!
+}
+
+type TickStats {
+  organismCount: Int!
+  births: Int!
+  deaths: Int!
+  mutations: Int!
+  avgFitness: Float
+}
+
+type GridSnapshot {
+  width: Int!
+  height: Int!
+
+  organisms: String!
+  nutrients: String!
+  antibiotic: String!
+  temperature: String!
+
+  encoding: String!
+}
+
+type GridDelta {
+  width: Int!
+  height: Int!
+
+  organismPatches: [CellPatch!]!
+  nutrientPatches: [CellPatch!]!
+  antibioticPatches: [CellPatch!]!
+  temperaturePatches: [CellPatch!]!
+
+  encoding: String!
+}
+
+type CellPatch {
+  x: Int!
+  y: Int!
+  value: Int!
+}
+
+# ----------------------------
+# Actions (commands) - output types
+# ----------------------------
+
+type PlayerAction {
+  id: UUID!
+  type: ActionType!
+  arenaId: UUID!
+  playerId: UUID!
+  submittedAt: Time!
+  applyAtTick: Long!
+
+  payload: ActionPayload!
+}
+
+union ActionPayload =
+    AddNutrientsPayload
+  | DropAntibioticPayload
+  | SetTemperaturePayload
+  | SpawnOrganismPayload
+
+type AddNutrientsPayload {
+  area: Area!
+  amount: Int!
+}
+
+type DropAntibioticPayload {
+  area: Area!
+  kind: AntibioticKind!
+  concentration: Float!
+}
+
+type SetTemperaturePayload {
+  temperature: Temperature!
+}
+
+type SpawnOrganismPayload {
+  kind: OrganismKind!
+  position: Point!
+  genomeTemplateId: UUID
+}
+
+type Area {
+  x: Int!
+  y: Int!
+  width: Int!
+  height: Int!
+}
+
+type Point {
+  x: Int!
+  y: Int!
+}
+
+# ----------------------------
+# Read-side Entities
+# ----------------------------
+
+type Organism {
+  id: UUID!
+  kind: OrganismKind!
+  createdAt: Time!
+  arenaId: UUID!
+
+  position: Point!
+  energy: Float!
+  fitness: Float!
+
+  genome: Genome!
+  lineage: Lineage!
+}
+
+type Genome {
+  id: UUID!
+  createdAt: Time!
+  genes: [Gene!]!
+  signature: String!
+}
+
+type Gene {
+  name: String!
+  value: Float!
+  description: String
+}
+
+type Lineage {
+  organismId: UUID!
+  parentId: UUID
+  generation: Int!
+  mutations: [Mutation!]!
+}
+
+# ----------------------------
+# Metrics / Leaderboard
+# ----------------------------
+
+type ArenaMetrics {
+  arenaId: UUID!
+  windowSeconds: Int!
+
+  at: Time!
+  tick: Long!
+
+  organismCount: Int!
+  birthsPerSec: Float!
+  deathsPerSec: Float!
+  mutationRateObserved: Float!
+
+  topGenomes: [GenomeStat!]!
+}
+
+type GenomeStat {
+  genomeId: UUID!
+  signature: String!
+  count: Int!
+  avgFitness: Float
+}
+
+type LeaderboardEntry {
+  rank: Int!
+  organismId: UUID!
+  fitness: Float!
+  kind: OrganismKind!
+  genomeSignature: String!
+}

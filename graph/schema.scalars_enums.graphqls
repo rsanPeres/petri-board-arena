@@ -1,0 +1,19 @@
+"""
+RFC3339 timestamp, ex: 2026-02-15T12:34:56Z
+"""
+scalar Time
+scalar JSON
+scalar UUID
+scalar Long
+
+enum ArenaStatus { PENDING RUNNING PAUSED FINISHED }
+enum ActionType { ADD_NUTRIENTS DROP_ANTIBIOTIC SET_TEMPERATURE SPAWN_ORGANISM }
+enum DiffMode { FULL DELTA }
+enum OrganismKind { BACTERIA FUNGI PHAGE }
+enum AntibioticKind { A B C }
+enum TemperatureUnit { C }
+enum MutationKind { SNP INSERTION DELETION DUPLICATION }
+enum PlayerType { ADMIN PLAYER }
+
+enum WorldLayer { ORGANISMS NUTRIENTS ANTIBIOTIC TEMPERATURE }
+enum ArenaLifecycleEventKind { CREATED STARTED PAUSED RESUMED STOPPED FINISHED }
