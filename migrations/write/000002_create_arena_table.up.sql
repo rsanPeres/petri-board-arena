@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS arena (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE arenas
-  ADD CONSTRAINT arenas_status_chk
+ALTER TABLE arena
+  ADD CONSTRAINT arena_status_chk
   CHECK (status IN ('PENDING', 'RUNNING', 'PAUSED', 'FINISHED'));
 
-CREATE INDEX IF NOT EXISTS arenas_status_idx ON arenas (status);
-CREATE INDEX IF NOT EXISTS arenas_created_at_idx ON arenas (created_at DESC);
+CREATE INDEX IF NOT EXISTS arena_status_idx ON arena (status);
+CREATE INDEX IF NOT EXISTS arena_created_at_idx ON arena (created_at DESC);
