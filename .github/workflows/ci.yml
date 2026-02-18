@@ -43,12 +43,13 @@ jobs:
       APP_ENV: ci
       PORT: "8080"
 
-      env:
-        POSTGRES_DB: petri
-        POSTGRES_USER: petri
-        POSTGRES_PASSWORD: petri_pass
-        WRITE_DATABASE_URL: postgres://petri:petri_pass@localhost:5432/petri?sslmode=disable
-        READ_DATABASE_URL: redis://localhost:6379/0
+      # Datastores (standardized)
+      WRITE_DATABASE_URL: postgres://petri:petri_pass@localhost:5432/petri?sslmode=disable
+      READ_DATABASE_URL: redis://localhost:6379/0
+
+      POSTGRES_DB: petri
+      POSTGRES_USER: petri
+      POSTGRES_PASSWORD: petri_pass
 
     steps:
       - name: Checkout
@@ -59,6 +60,11 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
+
+      - name: Install system deps (postgres client + redis-cli)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client redis-tools
 
       - name: Wait for Postgres and Redis
         shell: bash
@@ -81,25 +87,20 @@ jobs:
             sleep 2
           done
 
-      - name: Install system deps (postgres client + redis-cli)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client redis-tools
-
       - name: Show env (safe)
         run: |
           echo "APP_ENV=$APP_ENV"
           echo "WRITE_DATABASE_URL=postgres://petri:***@localhost:5432/petri?sslmode=disable"
-          echo "REDIS_URL=redis://localhost:6379/0"
-
-      - name: Generate GraphQL + Lint + Test (CI)
-        run: make ci
+          echo "READ_DATABASE_URL=redis://localhost:6379/0"
 
       - name: Apply write migrations (Postgres)
         run: make ci-migrate-write-up
 
       - name: Bootstrap read model (Redis)
         run: make read-bootstrap
+
+      - name: Generate GraphQL + Lint + Test (CI)
+        run: make ci
 
       - name: Build binaries
         run: make build
