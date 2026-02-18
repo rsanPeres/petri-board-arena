@@ -39,7 +39,7 @@ tools-migrate:
 	@mkdir -p $(BIN_DIR)
 	@if [ ! -x "$(MIGRATE_BIN)" ]; then \
 		echo ">> installing golang-migrate into $(MIGRATE_BIN)"; \
-		GOBIN=$$(pwd)/$(BIN_DIR) $(GO) install -mod=mod github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
+		GOBIN=$(PWD)/bin go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest; \
 	fi
 	@$(MIGRATE_BIN) -version >/dev/null || true
 
