@@ -13,6 +13,11 @@ import (
 	"github.com/petri-board-arena/graph/model"
 )
 
+// CreateArena is the resolver for the createArena field.
+func (r *mutationResolver) CreateArena(ctx context.Context, input model.CreateArenaInput) (*model.CreateArenaPayload, error) {
+	panic(fmt.Errorf("not implemented: CreateArena - createArena"))
+}
+
 // StartArena is the resolver for the startArena field.
 func (r *mutationResolver) StartArena(ctx context.Context, input model.StartArenaInput) (*model.StartArenaPayload, error) {
 	panic(fmt.Errorf("not implemented: StartArena - startArena"))
@@ -51,6 +56,11 @@ func (r *mutationResolver) SubmitAction(ctx context.Context, input model.SubmitA
 // SetArenaConfig is the resolver for the setArenaConfig field.
 func (r *mutationResolver) SetArenaConfig(ctx context.Context, input model.SetArenaConfigInput) (*model.SetArenaConfigPayload, error) {
 	panic(fmt.Errorf("not implemented: SetArenaConfig - setArenaConfig"))
+}
+
+// Health is the resolver for the health field.
+func (r *queryResolver) Health(ctx context.Context) (*model.Health, error) {
+	panic(fmt.Errorf("not implemented: Health - health"))
 }
 
 // Arena is the resolver for the arena field.
@@ -108,4 +118,15 @@ func (r *subscriptionResolver) ArenaMetrics(ctx context.Context, arenaID uuid.UU
 	panic(fmt.Errorf("not implemented: ArenaMetrics - arenaMetrics"))
 }
 
-type subscriptionResolver struct{ r *Resolver }
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+
+// Subscription returns SubscriptionResolver implementation.
+func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
+
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }

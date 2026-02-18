@@ -19,10 +19,3 @@ func NewResolver(deps ResolverDeps) *Resolver {
 		CreateArenaHandler: deps.CreateArenaHandler,
 	}
 }
-
-// --- ResolverRoot implementation (gqlgen) ---
-
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r: r} }
-func (r *Resolver) Query() QueryResolver       { return &queryResolver{r: r} }
-
-func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r: r} }

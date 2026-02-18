@@ -43,3 +43,11 @@ type SnapshotEmittedEvent {
   tick: Long!
   mode: DiffMode!
 }
+
+# ----------------------------
+# Subscription root
+# ----------------------------
+type Subscription {
+  arenaEvents(arenaId: UUID!): ArenaEvent!
+}
+

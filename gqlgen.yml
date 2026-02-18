@@ -1,7 +1,5 @@
 schema:
   - graph/*.graphqls
-  # se você colocou os schemas em subpasta, descomente:
-  # - graph/**/*.graphqls
 
 exec:
   package: graph
@@ -25,18 +23,12 @@ models:
     model:
       - github.com/99designs/gqlgen/graphql.UUID
 
-  # Time é um scalar custom seu. Escolhe uma das opções:
-  # Opção A (recomendado): time.Time (encoding RFC3339 padrão)
   Time:
-    model:
-      - time.Time
+    model: github.com/99designs/gqlgen/graphql.Time
 
-  # Long é um scalar custom seu para tick, etc.
   Long:
     model:
       - github.com/99designs/gqlgen/graphql.Int64
-      # alternativa simples:
-      # - int64
 
   JSON:
     model:
