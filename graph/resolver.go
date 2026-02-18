@@ -1,8 +1,28 @@
 package graph
 
-// This file will not be regenerated automatically.
-//
-// It serves as dependency injection for your app, add any dependencies you require
-// here.
+import (
+	createarena "github.com/petri-board-arena/internal/application/command"
+)
 
-type Resolver struct{}
+// ResolverDeps: dependências injetadas (composition root)
+type ResolverDeps struct {
+	CreateArenaHandler *createarena.Handler
+}
+
+// Resolver: raiz do gqlgen
+type Resolver struct {
+	CreateArenaHandler *createarena.Handler
+}
+
+func NewResolver(deps ResolverDeps) *Resolver {
+	return &Resolver{
+		CreateArenaHandler: deps.CreateArenaHandler,
+	}
+}
+
+// --- ResolverRoot implementation (gqlgen) ---
+
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r: r} }
+func (r *Resolver) Query() QueryResolver       { return &queryResolver{r: r} }
+
+func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r: r} }

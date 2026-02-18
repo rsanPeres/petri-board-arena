@@ -8,7 +8,7 @@ input CreateArenaInput {
 }
 
 input ArenaConfigInput {
-  tickMillis: Int! = 100
+  tickMillis: Long! = 100
   width: Int! = 256
   height: Int! = 256
 

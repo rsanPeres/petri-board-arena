@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: petri
+          POSTGRES_USER: petri
+          POSTGRES_PASSWORD: petri_pass
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U petri -d petri"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=10
+
+    env:
+      # App env
+      APP_ENV: ci
+      PORT: "8080"
+
+      env:
+        POSTGRES_DB: petri
+        POSTGRES_USER: petri
+        POSTGRES_PASSWORD: petri_pass
+        WRITE_DATABASE_URL: postgres://petri:petri_pass@localhost:5432/petri?sslmode=disable
+        READ_DATABASE_URL: redis://localhost:6379/0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Wait for Postgres and Redis
+        shell: bash
+        run: |
+          echo "Waiting for Postgres..."
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U petri -d petri; then
+              echo "Postgres is ready."
+              break
+            fi
+            sleep 2
+          done
+
+          echo "Waiting for Redis..."
+          for i in {1..30}; do
+            if redis-cli -h localhost -p 6379 ping | grep -q PONG; then
+              echo "Redis is ready."
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Install system deps (postgres client + redis-cli)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client redis-tools
+
+      - name: Show env (safe)
+        run: |
+          echo "APP_ENV=$APP_ENV"
+          echo "WRITE_DATABASE_URL=postgres://petri:***@localhost:5432/petri?sslmode=disable"
+          echo "REDIS_URL=redis://localhost:6379/0"
+
+      - name: Generate GraphQL + Lint + Test (CI)
+        run: make ci
+
+      - name: Apply write migrations (Postgres)
+        run: make ci-migrate-write-up
+
+      - name: Bootstrap read model (Redis)
+        run: make read-bootstrap
+
+      - name: Build binaries
+        run: make build

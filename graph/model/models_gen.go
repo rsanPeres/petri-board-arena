@@ -90,7 +90,7 @@ type ArenaConfig struct {
 }
 
 type ArenaConfigInput struct {
-	TickMillis         int32             `json:"tickMillis"`
+	TickMillis         int64             `json:"tickMillis"`
 	Width              int32             `json:"width"`
 	Height             int32             `json:"height"`
 	DiffusionRate      float64           `json:"diffusionRate"`

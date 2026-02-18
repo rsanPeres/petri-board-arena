@@ -9982,7 +9982,7 @@ func (ec *executionContext) unmarshalInputArenaConfigInput(ctx context.Context, 
 		switch k {
 		case "tickMillis":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tickMillis"))
-			data, err := ec.unmarshalNInt2int32(ctx, v)
+			data, err := ec.unmarshalNLong2int64(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -14471,10 +14471,6 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return ec._Time(ctx, sel, &v)
 }
 
-func (ec *executionContext) unmarshalInputTime(ctx context.Context, v any) (time.Time, error) {
-	return graphql.UnmarshalTime(v)
-}
-
 func (ec *executionContext) unmarshalNUUID2githubᚗcomᚋgoogleᚋuuidᚐUUID(ctx context.Context, v any) (uuid.UUID, error) {
 	res, err := graphql.UnmarshalUUID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -15046,12 +15042,23 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
+func (ec *executionContext) unmarshalInputTime(ctx context.Context, v any) (time.Time, error) {
+	return graphql.UnmarshalTime(v)
+}
+
 func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v any) (*time.Time, error) {
 	if v == nil {
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputTime(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalString(v.Format(time.RFC3339Nano))
 }
 
 func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
@@ -15279,13 +15286,6 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
-}
-
-func (ec *executionContext) _Time(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return graphql.MarshalTime(*v)
 }
 
 // endregion ***************************** type.gotpl *****************************
